@@ -26,7 +26,7 @@ app.post('/', (req, res) => {
     form.parse(req);
 
     form.on('fileBegin', function (name, file){
-        file.path = __dirname + "/images/" + file.name;
+        file.path = __dirname + "/" + file.name;
     });
 
     form.on('file', function (name, file){
