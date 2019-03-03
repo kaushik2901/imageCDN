@@ -79,7 +79,7 @@ app.get('/:image', async (req, res) => {
                     }
 
                     let buffer = new Buffer.from(doc.img.data, 'binary')
-                    res.setHeader("Content-type", "image/jpeg");
+                    res.setHeader("Content-type", "image/jpg");
                     res.send(buffer);
                 })
     } catch(e) {
