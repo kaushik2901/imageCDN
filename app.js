@@ -18,6 +18,7 @@ app.get('/', (req, res) => res.json({ success: true, message: "Welcome to Image 
 
 app.post('/', (req, res) => {
 
+    let filePath;
     let form = new formidable.IncomingForm({
         uploadDir: __dirname,
         keepExtensions: true
@@ -26,7 +27,7 @@ app.post('/', (req, res) => {
     form.parse(req);
 
     form.on('fileBegin', function (name, file){
-        file.path = __dirname + "/" + file.name;
+        file.path = filePath = __dirname + "/" + file.name;
     });
 
     form.on('file', function (name, file){
@@ -42,6 +43,7 @@ app.post('/', (req, res) => {
                 data: file.name,
                 _id: data._id
             });
+            fs.unlinkSync(filePath);
             return
         }).catch(err => {
             console.error(err); 
@@ -68,7 +70,7 @@ app.get('/list', async (req, res) => {
 app.get('/:image', async (req, res) => {
     try{
         await db.Image.findOne({ "name": req.params.image })
-                .then(doc => {
+                .then(async doc => {
 
                     if(!doc) {
                         res.json({
@@ -78,9 +80,11 @@ app.get('/:image', async (req, res) => {
                         return;
                     }
 
-                    let buffer = new Buffer.from(doc.img.data, 'binary')
-                    res.setHeader("Content-type", "image/jpg");
-                    res.send(buffer);
+                    let buffer = new Buffer.from(doc.img.data, 'binary');
+
+                    res.setHeader("Content-type", "image/jpg; charset=utf-8");
+                    res.send(buffer)
+
                 })
     } catch(e) {
         console.error(e); 
